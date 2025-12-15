@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import CategoryCard from "../components/CategoryCard";
 import HomeTopCard from "../components/HomeTopCard";
+import { useRouter } from "expo-router";
 
 const categories = [
   { name: "work", count: 5, icon_name: "briefcase-outline" },
@@ -13,11 +14,20 @@ const categories = [
 ];
 
 const HomeScreen: React.FC = () => {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.topSection}>
-          <HomeTopCard userName="User" style={styles.topCard} />
+          <HomeTopCard
+            userName="User"
+            style={styles.topCard}
+            onProfilePress={() => {
+              const current = (router as any).pathname || '';
+              if (current !== '/profile') router.push('/profile');
+            }}
+          />
 
           <View style={styles.categoriesHeaderRow}>
             <Text style={styles.categoriesTitle}>Categories</Text>
@@ -25,22 +35,32 @@ const HomeScreen: React.FC = () => {
 
           <View style={styles.categoriesList}>
             <CategoryCard
-              icon={
-                <Ionicons name="briefcase-outline" size={24} color="#FFFFFF" />
-              }
+              icon={<Ionicons name="briefcase-outline" size={24} color="#FFFFFF" />}
               name="Work"
               count={8}
+              onPress={() => {
+                const current = (router as any).pathname || '';
+                if (current !== '/ViewNotes') router.push('/ViewNotes?category=work');
+              }}
             />
             <CategoryCard
               icon={<Ionicons name="book-outline" size={24} color="#FFFFFF" />}
               name="Study"
               count={12}
+              onPress={() => {
+                const current = (router as any).pathname || '';
+                if (current !== '/ViewNotes') router.push('/ViewNotes?category=study');
+              }}
             />
 
             <CategoryCard
               icon={<Ionicons name="heart-outline" size={24} color="#FFFFFF" />}
               name="Personal"
               count={5}
+              onPress={() => {
+                const current = (router as any).pathname || '';
+                if (current !== '/ViewNotes') router.push('/ViewNotes?category=personal');
+              }}
             />
           </View>
         </View>

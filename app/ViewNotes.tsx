@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddNoteFab from "../components/AddNoteFab";
 import NoteItemCard from "../components/NoteItemCard";
@@ -82,17 +82,27 @@ const ViewNotesScreen: React.FC = () => {
 
         <View style={styles.list}>
           {notes.map((n) => (
-            <NoteItemCard
-              key={n.id}
-              title={n.title}
-              description={n.description}
-              date={n.date}
-            />
+              <TouchableOpacity
+                key={n.id}
+                activeOpacity={0.8}
+                onPress={() => {
+                  const current = (router as any).pathname || '';
+                  if (current !== '/Edit_note') router.push(`/Edit_note?id=${n.id}`);
+                }}
+              >
+                <NoteItemCard title={n.title} description={n.description} date={n.date} />
+              </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
 
-      <AddNoteFab color={color} onPress={() => router.push("/Add_Note")} />
+      <AddNoteFab
+        color={color}
+        onPress={() => {
+          const current = (router as any).pathname || '';
+          if (current !== '/Add_Note') router.push('/Add_Note');
+        }}
+      />
     </SafeAreaView>
   );
 };

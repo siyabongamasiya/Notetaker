@@ -1,41 +1,17 @@
-import AddNoteFab from "@/components/AddNoteFab";
-import NoteItemCard from "@/components/NoteItemCard";
-import NotesTopCard from "@/components/NotesTopCard";
-import Sorter from "@/components/Sorter";
-import { useState } from "react";
-import { StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import LoginScreen from "./login";
-import RegisterScreen from "./register";
-import HomeScreen from "./home";
-import AddNoteScreen from "./Add_Note";
-import EditNoteScreen from "./Edit_note";
-import ViewNotesScreen from "./ViewNotes";
-import ProfileScreen from "./profile";
+import React, { useEffect } from 'react';
+import { useRouter } from 'expo-router';
 
-export default function ModalScreen() {
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  return (
-    <SafeAreaView style={styles.container}>
-      <ProfileScreen/>
-    </SafeAreaView>
-  );
+export default function IndexRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    // Delay the initial replace until after the root layout mounts.
+    // Using requestAnimationFrame ensures the navigation happens after
+    // the native commit so the router is ready and avoids the
+    // "navigate before mounting the Root Layout" error.
+    const raf = requestAnimationFrame(() => {
+      router.replace('/login');
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [router]);
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "stretch",
-    justifyContent: "flex-start",
-    padding: 5,
-    paddingBottom: 28,
-  },
-  list: {
-    width: "100%",
-    gap: 12,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});

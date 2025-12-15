@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -24,10 +25,12 @@ const EditNoteScreen: React.FC = () => {
     console.log({ title, content, category });
   };
 
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <SimpleTopCard title="Edit note" />
+        <SimpleTopCard title="Edit note" onBack={() => (router.back ? router.back() : router.replace('/home'))} />
 
         <View style={styles.form}>
           <EditText
@@ -81,7 +84,17 @@ const EditNoteScreen: React.FC = () => {
           </View>
 
           <View style={styles.saveBtnWrap}>
-            <Button text="Save Changes" onPress={handleSave} />
+            <Button
+              text="Save Changes"
+              onPress={() => {
+                handleSave();
+                if ((router as any).back) {
+                  (router as any).back();
+                } else {
+                  router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+                }
+              }}
+            />
           </View>
         </View>
       </ScrollView>

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useRouter } from "expo-router";
 import {
   StyleProp,
   StyleSheet,
@@ -71,6 +72,7 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
   onSearch,
 }) => {
   const [searchText, setSearchText] = useState("");
+  const router = useRouter();
 
   const startColor = categoryColors[category] || "#3B7DFF";
   const endColor = blendMidColor(startColor, "#FFFFFF") || startColor;
@@ -92,7 +94,12 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
     >
       <View style={styles.row}>
         <TouchableOpacity
-          onPress={onBack}
+          onPress={() => {
+            if (onBack) return onBack();
+            // fall back to router.back() when available
+            if ((router as any).back) return (router as any).back();
+            return router.replace("/home");
+          }}
           activeOpacity={0.8}
           style={[
             styles.backSquare,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -19,15 +20,23 @@ const AddNoteScreen: React.FC = () => {
   const [category, setCategory] = useState<string>("Work");
   const [open, setOpen] = useState(false);
 
+  const router = useRouter();
+
   const handleSave = () => {
     // placeholder: implement save logic later
     console.log({ title, content, category });
+    // Go back to the previous screen when possible to avoid creating duplicate ViewNotes entries
+    if ((router as any).back) {
+      (router as any).back();
+    } else {
+      router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <SimpleTopCard title="Add note" />
+        <SimpleTopCard title="Add note" onBack={() => (router.back ? router.back() : router.replace('/home'))} />
 
         <View style={styles.form}>
           <EditText

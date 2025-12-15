@@ -1,10 +1,13 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoginCard from "../components/LoginCard";
 
 const LoginScreen: React.FC = () => {
+  const router = useRouter();
+
   return (
     <LinearGradient
       colors={["#3B7DFF", "#AA48FF", "#3B7DFF"]}
@@ -28,7 +31,10 @@ const LoginScreen: React.FC = () => {
           </View>
 
           <View style={styles.bottomSection}>
-            <LoginCard />
+            <LoginCard
+              onSubmit={() => router.replace('/home')}
+              onRegisterPress={() => router.push('/register')}
+            />
           </View>
         </View>
       </SafeAreaView>

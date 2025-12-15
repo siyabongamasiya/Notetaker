@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LogoutButton from "../components/LogoutButton";
@@ -11,12 +12,20 @@ const ProfileScreen: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const router = useRouter();
+
   const handleSave = () => {
     console.log("save", { username, email, password });
+    if ((router as any).back) {
+      (router as any).back();
+    } else {
+      router.replace('/home');
+    }
   };
 
   const handleLogout = () => {
     console.log("logout");
+    router.replace('/login');
   };
 
   return (
@@ -25,7 +34,10 @@ const ProfileScreen: React.FC = () => {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <SimpleTopCard title="Profile Settings" />
+        <SimpleTopCard
+          title="Profile Settings"
+          onBack={() => (router.back ? (router.back as any)() : router.replace('/home'))}
+        />
 
         <View style={styles.form}>
           <EditText

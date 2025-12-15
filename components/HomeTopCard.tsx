@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, Image, StyleSheet, ViewStyle, StyleProp, ColorValue } from 'react-native';
+import { View, Text, Image, StyleSheet, ViewStyle, StyleProp, ColorValue, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export type HomeTopCardProps = {
@@ -9,6 +9,7 @@ export type HomeTopCardProps = {
   borderRadius?: number;
   startColor?: ColorValue; // gradient start (defaults to #3B7DFF)
   endColor?: ColorValue;   // gradient end (defaults to #AA48FF)
+  onProfilePress?: () => void;
 };
 
 // helpers to blend mid color similar to Button gradient
@@ -49,6 +50,7 @@ const HomeTopCard: React.FC<HomeTopCardProps> = ({
   borderRadius = 16,
   startColor = '#3B7DFF',
   endColor = '#AA48FF',
+  onProfilePress,
 }) => {
   const gradientConfig = useMemo(() => {
     const canBlend = typeof startColor === 'string' && typeof endColor === 'string';
@@ -76,17 +78,21 @@ const HomeTopCard: React.FC<HomeTopCardProps> = ({
           <Text style={styles.subtitle}>welcome back {userName}</Text>
         </View>
         {profileImageUri ? (
-          <Image
-            source={{ uri: profileImageUri }}
-            style={styles.avatar}
-            resizeMode="cover"
-          />
+          <TouchableOpacity onPress={onProfilePress} activeOpacity={0.8}>
+            <Image
+              source={{ uri: profileImageUri }}
+              style={styles.avatar}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
         ) : (
-          <View style={[styles.avatar, styles.avatarFallback]}>
-            <Text style={styles.avatarInitials}>
-              {userName?.trim()?.[0]?.toUpperCase() || 'U'}
-            </Text>
-          </View>
+          <TouchableOpacity onPress={onProfilePress} activeOpacity={0.8}>
+            <View style={[styles.avatar, styles.avatarFallback]}>
+              <Text style={styles.avatarInitials}>
+                {userName?.trim()?.[0]?.toUpperCase() || 'U'}
+              </Text>
+            </View>
+          </TouchableOpacity>
         )}
       </View>
     </LinearGradient>
