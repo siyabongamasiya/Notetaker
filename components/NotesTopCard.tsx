@@ -1,13 +1,12 @@
 import React, { useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
   StyleProp,
-  ColorValue,
+  StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 // removed expo-linear-gradient to use solid background color
 import { Ionicons } from "@expo/vector-icons";
@@ -84,7 +83,13 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
   }, [startColor, endColor]);
 
   return (
-    <View style={[styles.card, { borderRadius, backgroundColor: startColor }, style as any]}>
+    <View
+      style={[
+        styles.card,
+        { borderRadius, backgroundColor: startColor },
+        style as any,
+      ]}
+    >
       <View style={styles.row}>
         <TouchableOpacity
           onPress={onBack}

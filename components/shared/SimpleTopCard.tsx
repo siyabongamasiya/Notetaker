@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'transparent',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 20,
   },
   row: {
     flexDirection: 'row',
