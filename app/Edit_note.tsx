@@ -1,16 +1,16 @@
-import React, { useState } from "react";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SimpleTopCard from "../components/shared/SimpleTopCard";
-import EditText from "../components/shared/EditText";
 import Button from "../components/shared/Button";
+import EditText from "../components/shared/EditText";
+import SimpleTopCard from "../components/shared/SimpleTopCard";
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -29,8 +29,14 @@ const EditNoteScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <SimpleTopCard title="Edit note" onBack={() => (router.back ? router.back() : router.replace('/home'))} />
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <SimpleTopCard
+          title="Edit note"
+          onBack={() => (router.back ? router.back() : router.replace("/home"))}
+        />
 
         <View style={styles.form}>
           <EditText
@@ -91,7 +97,9 @@ const EditNoteScreen: React.FC = () => {
                 if ((router as any).back) {
                   (router as any).back();
                 } else {
-                  router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+                  router.replace(
+                    `/ViewNotes?category=${category.toLowerCase()}`
+                  );
                 }
               }}
             />
@@ -105,7 +113,7 @@ const EditNoteScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F8F5FE" },
   container: {
-    flex:1,
+    flex: 1,
     gap: 30,
     paddingHorizontal: 20,
   },
