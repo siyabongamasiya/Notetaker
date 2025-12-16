@@ -1,0 +1,14 @@
+{
+  "name": "notetaker",
+  "version": "1.0.0",
+  "description": "NoteTaker App - Frontend (React Native) + Backend (Express/TypeScript)",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
