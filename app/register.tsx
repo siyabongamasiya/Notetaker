@@ -1,12 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
 import { useRouter } from "expo-router";
-import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../store/slices/authSlice';
-import { RootState } from '../store';
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 import RegisterCard from "../components/RegisterCard";
+import { RootState } from "../store";
+import { register } from "../store/slices/authSlice";
 
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
@@ -14,7 +14,7 @@ const RegisterScreen: React.FC = () => {
   const user = useSelector((s: RootState) => s.auth.user);
 
   React.useEffect(() => {
-    if (user) router.replace('/home');
+    if (user) router.replace("/home");
   }, [user]);
 
   return (
@@ -39,10 +39,14 @@ const RegisterScreen: React.FC = () => {
 
           <View style={styles.bottomSection}>
             <RegisterCard
-              onSubmit={(vals: { email: string; password: string; username: string }) => {
+              onSubmit={(vals: {
+                email: string;
+                password: string;
+                username: string;
+              }) => {
                 dispatch(register(vals));
               }}
-              onLoginPress={() => router.push('/login')}
+              onLoginPress={() => router.push("/login")}
             />
           </View>
         </View>

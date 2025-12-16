@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,12 +8,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
-import { useDispatch, useSelector } from 'react-redux';
-import { updateNote } from '../store/slices/notesSlice';
-import { RootState } from '../store';
+import { RootState } from "../store";
+import { updateNote } from "../store/slices/notesSlice";
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -31,14 +31,14 @@ const EditNoteScreen: React.FC = () => {
   const id = params.id as string | undefined;
 
   useEffect(() => {
-    if (!user) router.replace('/login');
+    if (!user) router.replace("/login");
   }, [user]);
 
   useEffect(() => {
     if (id) {
       const n = notesAll.find((x) => x.id === id);
       if (n) {
-        setTitle(n.title || '');
+        setTitle(n.title || "");
         setContent(n.content);
         setCategory(n.category.charAt(0).toUpperCase() + n.category.slice(1));
       }
@@ -46,7 +46,12 @@ const EditNoteScreen: React.FC = () => {
   }, [id, notesAll]);
 
   const handleSave = () => {
-    dispatch(updateNote({ id: id || String(Date.now()), changes: { title, content, category: category.toLowerCase() as any } }));
+    dispatch(
+      updateNote({
+        id: id || String(Date.now()),
+        changes: { title, content, category: category.toLowerCase() as any },
+      })
+    );
     if ((router as any).back) {
       (router as any).back();
     } else {

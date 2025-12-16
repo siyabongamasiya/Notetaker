@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type User = {
   id: string;
@@ -17,28 +17,59 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    register: (state, action: PayloadAction<{ email: string; password: string; username: string }>) => {
+    register: (
+      state,
+      action: PayloadAction<{
+        email: string;
+        password: string;
+        username: string;
+      }>
+    ) => {
       // dummy registration: store user locally
       const id = String(Date.now());
-      state.user = { id, email: action.payload.email, username: action.payload.username };
+      state.user = {
+        id,
+        email: action.payload.email,
+        username: action.payload.username,
+      };
       state.token = `token-${id}`;
     },
-    login: (state, action: PayloadAction<{ email: string; password: string }>) => {
+    login: (
+      state,
+      action: PayloadAction<{ email: string; password: string }>
+    ) => {
       // dummy login: accept any credentials
       const id = String(Date.now());
-      state.user = { id, email: action.payload.email, username: action.payload.email.split('@')[0] };
+      state.user = {
+        id,
+        email: action.payload.email,
+        username: action.payload.email.split("@")[0],
+      };
       state.token = `token-${id}`;
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
     },
-    updateProfile: (state, action: PayloadAction<{ email?: string; username?: string; password?: string }>) => {
+    updateProfile: (
+      state,
+      action: PayloadAction<{
+        email?: string;
+        username?: string;
+        password?: string;
+      }>
+    ) => {
       if (!state.user) return;
-      state.user = { ...state.user, ...(action.payload.email ? { email: action.payload.email } : {}), ...(action.payload.username ? { username: action.payload.username } : {}) };
+      state.user = {
+        ...state.user,
+        ...(action.payload.email ? { email: action.payload.email } : {}),
+        ...(action.payload.username
+          ? { username: action.payload.username }
+          : {}),
+      };
     },
   },
 });

@@ -1,12 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
 import { useRouter } from "expo-router";
+import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 import LoginCard from "../components/LoginCard";
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../store/slices/authSlice';
-import { RootState } from '../store';
+import { RootState } from "../store";
+import { login } from "../store/slices/authSlice";
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
@@ -14,7 +14,7 @@ const LoginScreen: React.FC = () => {
   const user = useSelector((s: RootState) => s.auth.user);
 
   React.useEffect(() => {
-    if (user) router.replace('/home');
+    if (user) router.replace("/home");
   }, [user]);
 
   return (
@@ -48,7 +48,7 @@ const LoginScreen: React.FC = () => {
               onSubmit={(values: { email: string; password: string }) => {
                 dispatch(login(values));
               }}
-              onRegisterPress={() => router.push('/register')}
+              onRegisterPress={() => router.push("/register")}
             />
           </View>
         </View>

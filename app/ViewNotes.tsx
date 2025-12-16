@@ -1,13 +1,19 @@
 import { useRouter } from "expo-router";
-import React, { useMemo, useState, useEffect } from "react";
-import { ScrollView, StyleSheet, View, TouchableOpacity, TextInput, Text } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import AddNoteFab from "../components/AddNoteFab";
 import NoteItemCard from "../components/NoteItemCard";
 import NotesTopCard from "../components/NotesTopCard";
 import Sorter from "../components/Sorter";
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { RootState } from "../store";
 
 const CATEGORY_COLORS: Record<string, string> = {
   work: "#3B7DFF",
@@ -54,26 +60,31 @@ const ViewNotesScreen: React.FC = () => {
   const params = (router as any).params ?? {};
   const selectedCategory = (params.category as string) || "study";
   const [order, setOrder] = useState<"newest" | "oldest">("newest");
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const notesAll = useSelector((s: RootState) => s.notes.notes);
   const user = useSelector((s: RootState) => s.auth.user);
 
   useEffect(() => {
-    if (!user) router.replace('/login');
+    if (!user) router.replace("/login");
   }, [user]);
 
   const color = CATEGORY_COLORS[selectedCategory?.toLowerCase()] || "#3B7DFF";
 
   const notes = useMemo(() => {
-    const base = notesAll.filter((n) => n.category === selectedCategory.toLowerCase());
+    const base = notesAll.filter(
+      (n) => n.category === selectedCategory.toLowerCase()
+    );
     const searched = query
       ? base.filter((n) => {
           const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-          return terms.every((t) => (n.content + ' ' + (n.title || '')).toLowerCase().includes(t));
+          return terms.every((t) =>
+            (n.content + " " + (n.title || "")).toLowerCase().includes(t)
+          );
         })
       : base;
     const sorted = [...searched].sort((a, b) => {
-      if (order === "newest") return +new Date(b.dateAdded) - +new Date(a.dateAdded);
+      if (order === "newest")
+        return +new Date(b.dateAdded) - +new Date(a.dateAdded);
       return +new Date(a.dateAdded) - +new Date(b.dateAdded);
     });
     return sorted;
@@ -96,21 +107,25 @@ const ViewNotesScreen: React.FC = () => {
 
         {query ? (
           <View style={{ marginTop: 8, marginBottom: 8 }}>
-            <Text style={{ color: '#374151' }}>{notes.length} result(s)</Text>
+            <Text style={{ color: "#374151" }}>{notes.length} result(s)</Text>
           </View>
         ) : null}
 
         <View style={styles.list}>
           {notes.map((n) => (
-              <TouchableOpacity
-                key={n.id}
-                activeOpacity={0.8}
-                onPress={() => {
-                  router.push(`/Edit_note?id=${n.id}`);
-                }}
-              >
-                <NoteItemCard title={n.title || ''} description={n.content} date={new Date(n.dateAdded)} />
-              </TouchableOpacity>
+            <TouchableOpacity
+              key={n.id}
+              activeOpacity={0.8}
+              onPress={() => {
+                router.push(`/Edit_note?id=${n.id}`);
+              }}
+            >
+              <NoteItemCard
+                title={n.title || ""}
+                description={n.content}
+                date={new Date(n.dateAdded)}
+              />
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -118,8 +133,8 @@ const ViewNotesScreen: React.FC = () => {
       <AddNoteFab
         color={color}
         onPress={() => {
-          const current = (router as any).pathname || '';
-          if (current !== '/Add_Note') router.push('/Add_Note');
+          const current = (router as any).pathname || "";
+          if (current !== "/Add_Note") router.push("/Add_Note");
         }}
       />
     </SafeAreaView>

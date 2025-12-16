@@ -1,14 +1,14 @@
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 import LogoutButton from "../components/LogoutButton";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { updateProfile, logout } from '../store/slices/authSlice';
+import { RootState } from "../store";
+import { logout, updateProfile } from "../store/slices/authSlice";
 
 const ProfileScreen: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -21,8 +21,8 @@ const ProfileScreen: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setUsername(user.username || '');
-      setEmail(user.email || '');
+      setUsername(user.username || "");
+      setEmail(user.email || "");
     }
   }, [user]);
 
@@ -37,7 +37,7 @@ const ProfileScreen: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.replace('/login');
+    router.replace("/login");
   };
 
   return (
