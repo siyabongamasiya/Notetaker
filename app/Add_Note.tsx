@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,12 +8,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
-import { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addNote } from "../store/slices/notesSlice";
+import { RootState } from "@/store";
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -24,19 +24,17 @@ const AddNoteScreen: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user = useSelector((s: RootState) => s.auth.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
   const handleSave = () => {
-    // dispatch addNote
     dispatch(
       addNote({ title, content, category: category.toLowerCase() as any })
     );
-    // Go back to the previous screen when possible to avoid creating duplicate ViewNotes entries
     if ((router as any).back) {
       (router as any).back();
     } else {

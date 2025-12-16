@@ -2,12 +2,11 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import LogoutButton from "../components/LogoutButton";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
-import { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { logout, updateProfile } from "../store/slices/authSlice";
 
 const ProfileScreen: React.FC = () => {
@@ -16,8 +15,8 @@ const ProfileScreen: React.FC = () => {
   const [password, setPassword] = useState("");
 
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user = useSelector((s: RootState) => s.auth.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
 
   useEffect(() => {
     if (user) {

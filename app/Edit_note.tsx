@@ -8,12 +8,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
-import { RootState } from "../store";
-import { updateNote } from "../store/slices/notesSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { Note, updateNote } from "../store/slices/notesSlice";
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -24,9 +23,9 @@ const EditNoteScreen: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user = useSelector((s: RootState) => s.auth.user);
-  const notesAll = useSelector((s: RootState) => s.notes.notes);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
+  const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
   const params = (router as any).params ?? {};
   const id = params.id as string | undefined;
 

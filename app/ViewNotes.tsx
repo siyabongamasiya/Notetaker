@@ -1,19 +1,13 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
 import AddNoteFab from "../components/AddNoteFab";
 import NoteItemCard from "../components/NoteItemCard";
 import NotesTopCard from "../components/NotesTopCard";
 import Sorter from "../components/Sorter";
-import { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { deleteNote, Note } from "../store/slices/notesSlice";
 
 const CATEGORY_COLORS: Record<string, string> = {
   work: "#3B7DFF",
@@ -58,22 +52,45 @@ const ViewNotesScreen: React.FC = () => {
   // fall back to "work" when not provided. expo-router may expose
   // params differently depending on routing setup, so use a safe any-cast.
   const params = (router as any).params ?? {};
-  const selectedCategory = (params.category as string) || "study";
+  // Prefer router.searchParams if available, else params, else parse URL query string
+  const rawCategoryFromSearch = (router as any).searchParams?.category as
+    | string
+    | undefined;
+  const rawCategoryFromPath = (() => {
+    try {
+      const path = (router as any).pathname as string | undefined;
+      if (!path) return undefined;
+      const idx = path.indexOf("?");
+      if (idx === -1) return undefined;
+      const qs = path.slice(idx + 1);
+      const usp = new URLSearchParams(qs);
+      return usp.get("category") || undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const rawCategory =
+    rawCategoryFromSearch || (params.category as string) || rawCategoryFromPath;
+  const selectedCategory = (
+    rawCategory ? String(rawCategory) : "all"
+  ).toLowerCase();
   const [order, setOrder] = useState<"newest" | "oldest">("newest");
   const [query, setQuery] = useState("");
-  const notesAll = useSelector((s: RootState) => s.notes.notes);
-  const user = useSelector((s: RootState) => s.auth.user);
+  const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
+  const user = useAppSelector((s) => s.auth.user);
 
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  const color = CATEGORY_COLORS[selectedCategory?.toLowerCase()] || "#3B7DFF";
+  const color = CATEGORY_COLORS[selectedCategory] || "#3B7DFF";
 
   const notes = useMemo(() => {
-    const base = notesAll.filter(
-      (n) => n.category === selectedCategory.toLowerCase()
-    );
+    const base =
+      selectedCategory === "all"
+        ? notesAll
+        : notesAll.filter((n) => n.category === selectedCategory);
     const searched = query
       ? base.filter((n) => {
           const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -89,6 +106,7 @@ const ViewNotesScreen: React.FC = () => {
     });
     return sorted;
   }, [notesAll, selectedCategory, order, query]);
+  const dispatch = useAppDispatch();
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
@@ -113,19 +131,14 @@ const ViewNotesScreen: React.FC = () => {
 
         <View style={styles.list}>
           {notes.map((n) => (
-            <TouchableOpacity
+            <NoteItemCard
               key={n.id}
-              activeOpacity={0.8}
-              onPress={() => {
-                router.push(`/Edit_note?id=${n.id}`);
-              }}
-            >
-              <NoteItemCard
-                title={n.title || ""}
-                description={n.content}
-                date={new Date(n.dateAdded)}
-              />
-            </TouchableOpacity>
+              title={n.title || ""}
+              description={n.content}
+              date={new Date(n.dateAdded)}
+              onPress={() => router.push(`/Edit_note?id=${n.id}`)}
+              onDelete={() => dispatch(deleteNote({ id: n.id }))}
+            />
           ))}
         </View>
       </ScrollView>

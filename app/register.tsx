@@ -3,15 +3,14 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import RegisterCard from "../components/RegisterCard";
-import { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { register } from "../store/slices/authSlice";
 
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user = useSelector((s: RootState) => s.auth.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
 
   React.useEffect(() => {
     if (user) router.replace("/home");

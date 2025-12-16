@@ -3,15 +3,14 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
 import LoginCard from "../components/LoginCard";
-import { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { login } from "../store/slices/authSlice";
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const user = useSelector((s: RootState) => s.auth.user);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
 
   React.useEffect(() => {
     if (user) router.replace("/home");
@@ -83,10 +82,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
   },
-  logoText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
   title: {
     fontSize: 20,
     fontWeight: "700",
@@ -99,7 +94,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomSection: {
-    // ensure LoginCard sits at the bottom area and stretches horizontally
     alignSelf: "stretch",
     marginBottom: 24,
   },
