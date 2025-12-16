@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -11,6 +11,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
+import { useDispatch, useSelector } from 'react-redux';
+import { updateNote } from '../store/slices/notesSlice';
+import { RootState } from '../store';
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -20,12 +23,36 @@ const EditNoteScreen: React.FC = () => {
   const [category, setCategory] = useState<string>("Work");
   const [open, setOpen] = useState(false);
 
-  const handleSave = () => {
-    // placeholder: implement save logic later
-    console.log({ title, content, category });
-  };
-
   const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((s: RootState) => s.auth.user);
+  const notesAll = useSelector((s: RootState) => s.notes.notes);
+  const params = (router as any).params ?? {};
+  const id = params.id as string | undefined;
+
+  useEffect(() => {
+    if (!user) router.replace('/login');
+  }, [user]);
+
+  useEffect(() => {
+    if (id) {
+      const n = notesAll.find((x) => x.id === id);
+      if (n) {
+        setTitle(n.title || '');
+        setContent(n.content);
+        setCategory(n.category.charAt(0).toUpperCase() + n.category.slice(1));
+      }
+    }
+  }, [id, notesAll]);
+
+  const handleSave = () => {
+    dispatch(updateNote({ id: id || String(Date.now()), changes: { title, content, category: category.toLowerCase() as any } }));
+    if ((router as any).back) {
+      (router as any).back();
+    } else {
+      router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>

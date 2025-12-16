@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import CategoryCard from "../components/CategoryCard";
 import HomeTopCard from "../components/HomeTopCard";
 import { useRouter } from "expo-router";
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 const categories = [
   { name: "work", count: 5, icon_name: "briefcase-outline" },
@@ -15,13 +17,18 @@ const categories = [
 
 const HomeScreen: React.FC = () => {
   const router = useRouter();
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  React.useEffect(() => {
+    if (!user) router.replace('/login');
+  }, [user]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.topSection}>
           <HomeTopCard
-            userName="User"
+            userName={user?.username || 'User'}
             style={styles.topCard}
             onProfilePress={() => {
               const current = (router as any).pathname || '';

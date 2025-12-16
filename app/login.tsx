@@ -1,12 +1,21 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoginCard from "../components/LoginCard";
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../store/slices/authSlice';
+import { RootState } from '../store';
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  React.useEffect(() => {
+    if (user) router.replace('/home');
+  }, [user]);
 
   return (
     <LinearGradient
@@ -20,7 +29,11 @@ const LoginScreen: React.FC = () => {
           <View style={styles.topSection}>
             <View style={styles.brandColumn}>
               <View style={styles.logoBox}>
-                <Text style={styles.logoText}>Logo</Text>
+                <Image
+                  source={require("../assets/images/note-taker-app-icon-512.png")}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
               </View>
 
               <Text style={styles.title}>Note Taker</Text>
@@ -32,7 +45,9 @@ const LoginScreen: React.FC = () => {
 
           <View style={styles.bottomSection}>
             <LoginCard
-              onSubmit={() => router.replace('/home')}
+              onSubmit={(values: { email: string; password: string }) => {
+                dispatch(login(values));
+              }}
               onRegisterPress={() => router.push('/register')}
             />
           </View>
@@ -60,10 +75,13 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 12,
-    backgroundColor: "rgba(249, 250, 252, 0.4)",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
+  },
+  logo: {
+    width: 64,
+    height: 64,
   },
   logoText: {
     color: "#FFFFFF",

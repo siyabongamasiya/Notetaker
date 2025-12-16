@@ -4,7 +4,7 @@
     "slug": "Notetaker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/note-taker-logo-dark.png",
     "scheme": "notetaker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

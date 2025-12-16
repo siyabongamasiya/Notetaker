@@ -1,11 +1,14 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LogoutButton from "../components/LogoutButton";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { updateProfile, logout } from '../store/slices/authSlice';
 
 const ProfileScreen: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -13,9 +16,18 @@ const ProfileScreen: React.FC = () => {
   const [password, setPassword] = useState("");
 
   const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
 
   const handleSave = () => {
-    console.log("save", { username, email, password });
+    dispatch(updateProfile({ email, username, password }));
     if ((router as any).back) {
       (router as any).back();
     } else {
@@ -24,8 +36,8 @@ const ProfileScreen: React.FC = () => {
   };
 
   const handleLogout = () => {
-    console.log("logout");
-    router.replace("/login");
+    dispatch(logout());
+    router.replace('/login');
   };
 
   return (

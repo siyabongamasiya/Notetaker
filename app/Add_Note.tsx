@@ -11,6 +11,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
+import { useDispatch, useSelector } from 'react-redux';
+import { addNote } from '../store/slices/notesSlice';
+import { RootState } from '../store';
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
@@ -21,10 +24,16 @@ const AddNoteScreen: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  React.useEffect(() => {
+    if (!user) router.replace('/login');
+  }, [user]);
 
   const handleSave = () => {
-    // placeholder: implement save logic later
-    console.log({ title, content, category });
+    // dispatch addNote
+    dispatch(addNote({ title, content, category: category.toLowerCase() as any }));
     // Go back to the previous screen when possible to avoid creating duplicate ViewNotes entries
     if ((router as any).back) {
       (router as any).back();

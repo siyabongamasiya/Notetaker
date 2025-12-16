@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
+import React, { useMemo, useState, useEffect } from "react";
+import { ScrollView, StyleSheet, View, TouchableOpacity, TextInput, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddNoteFab from "../components/AddNoteFab";
 import NoteItemCard from "../components/NoteItemCard";
 import NotesTopCard from "../components/NotesTopCard";
 import Sorter from "../components/Sorter";
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 const CATEGORY_COLORS: Record<string, string> = {
   work: "#3B7DFF",
@@ -52,19 +54,30 @@ const ViewNotesScreen: React.FC = () => {
   const params = (router as any).params ?? {};
   const selectedCategory = (params.category as string) || "study";
   const [order, setOrder] = useState<"newest" | "oldest">("newest");
+  const [query, setQuery] = useState('');
+  const notesAll = useSelector((s: RootState) => s.notes.notes);
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  useEffect(() => {
+    if (!user) router.replace('/login');
+  }, [user]);
 
   const color = CATEGORY_COLORS[selectedCategory?.toLowerCase()] || "#3B7DFF";
 
   const notes = useMemo(() => {
-    const filtered = SAMPLE_NOTES.filter(
-      (n) => n.category === selectedCategory.toLowerCase()
-    );
-    const sorted = filtered.sort((a, b) => {
-      if (order === "newest") return +new Date(b.date) - +new Date(a.date);
-      return +new Date(a.date) - +new Date(b.date);
+    const base = notesAll.filter((n) => n.category === selectedCategory.toLowerCase());
+    const searched = query
+      ? base.filter((n) => {
+          const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+          return terms.every((t) => (n.content + ' ' + (n.title || '')).toLowerCase().includes(t));
+        })
+      : base;
+    const sorted = [...searched].sort((a, b) => {
+      if (order === "newest") return +new Date(b.dateAdded) - +new Date(a.dateAdded);
+      return +new Date(a.dateAdded) - +new Date(b.dateAdded);
     });
     return sorted;
-  }, [selectedCategory, order]);
+  }, [notesAll, selectedCategory, order, query]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
@@ -74,11 +87,18 @@ const ViewNotesScreen: React.FC = () => {
             1
           )} Notes`}
           category={selectedCategory as any}
+          onSearch={(t) => setQuery(t)}
         />
 
         <View style={styles.controlsRow}>
           <Sorter value={order} onChange={(o) => setOrder(o)} />
         </View>
+
+        {query ? (
+          <View style={{ marginTop: 8, marginBottom: 8 }}>
+            <Text style={{ color: '#374151' }}>{notes.length} result(s)</Text>
+          </View>
+        ) : null}
 
         <View style={styles.list}>
           {notes.map((n) => (
@@ -86,11 +106,10 @@ const ViewNotesScreen: React.FC = () => {
                 key={n.id}
                 activeOpacity={0.8}
                 onPress={() => {
-                  const current = (router as any).pathname || '';
-                  if (current !== '/Edit_note') router.push(`/Edit_note?id=${n.id}`);
+                  router.push(`/Edit_note?id=${n.id}`);
                 }}
               >
-                <NoteItemCard title={n.title} description={n.description} date={n.date} />
+                <NoteItemCard title={n.title || ''} description={n.content} date={new Date(n.dateAdded)} />
               </TouchableOpacity>
           ))}
         </View>
