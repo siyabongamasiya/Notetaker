@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 import authRouter from "./routes/authRoutes";
 import notesRouter from "./routes/noteRoutes";
-
+import { Request, Response } from "express";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/notes", notesRouter);
 // Health check
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.json({ status: "ok", message: "Notetaker backend running" });
 });
 
