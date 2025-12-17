@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { noteController } from "../controllers/NoteController";
 import { authMiddleware } from "../middleware/authMiddleware";
-
+import { Request, Response } from "express";
 const notesRouter = Router();
 
 // All note routes require authentication
