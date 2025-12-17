@@ -1,78 +1,127 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { pool } from "../db";
 
 const JWT_SECRET = process.env.JWT_SECRET || "default-secret";
 
-type UserRecord = {
-  id: string;
-  email: string;
-  username: string;
-  password: string; // hashed
-  createdAt: string;
-  updatedAt: string;
-};
-
-const users = new Map<string, UserRecord>();
-const usersByEmail = new Map<string, string>();
-
 export class AuthService {
   async register(email: string, username: string, password: string) {
-    if (usersByEmail.has(email)) throw new Error("Email already registered");
-    const hashed = await bcrypt.hash(password, 10);
+    const existing = await pool.query(
+      'SELECT id FROM "User" WHERE email = $1',
+      [email]
+    );
+
+    if ((existing.rowCount ?? 0) > 0) {
+      throw new Error("Email already registered");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     const id = uuidv4();
-    const now = new Date().toISOString();
-    const user: UserRecord = {
-      id,
-      email,
-      username,
-      password: hashed,
-      createdAt: now,
-      updatedAt: now,
-    };
-    users.set(id, user);
-    usersByEmail.set(email, id);
 
-    const token = jwt.sign({ userId: id, email }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    return { user: { id, email, username }, token };
-  }
+    const result = await pool.query(
+      `
+      INSERT INTO "User" (
+        id,
+        email,
+        username,
+        password,
+        "createdAt",
+        "updatedAt"
+      )
+      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      RETURNING id, email, username
+      `,
+      [id, email, username, hashedPassword]
+    );
 
-  async login(email: string, password: string) {
-    const id = usersByEmail.get(email);
-    if (!id) throw new Error("User not found");
-    const user = users.get(id)!;
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) throw new Error("Invalid password");
+    const user = result.rows[0];
+
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: "7d",
     });
+
+    return { user, token };
+  }
+
+  async login(email: string, password: string) {
+    const result = await pool.query(
+      'SELECT id, email, username, password FROM "User" WHERE email = $1',
+      [email]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      throw new Error("User not found");
+    }
+
+    const user = result.rows[0];
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      throw new Error("Invalid password");
+    }
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
     return {
-      user: { id: user.id, email: user.email, username: user.username },
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
       token,
     };
   }
 
   async getUserById(userId: string) {
-    const u = users.get(userId);
-    if (!u) return null;
-    return { id: u.id, email: u.email, username: u.username };
+    const result = await pool.query(
+      'SELECT id, email, username FROM "User" WHERE id = $1',
+      [userId]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      return null;
+    }
+
+    return result.rows[0];
   }
 
   async updateProfile(userId: string, email?: string, username?: string) {
-    const u = users.get(userId);
-    if (!u) throw new Error("User not found");
-    if (email && email !== u.email) {
-      if (usersByEmail.has(email)) throw new Error("Email already in use");
-      usersByEmail.delete(u.email);
-      usersByEmail.set(email, userId);
-      u.email = email;
+    if (!email && !username) {
+      throw new Error("Nothing to update");
     }
-    if (username) u.username = username;
-    u.updatedAt = new Date().toISOString();
-    users.set(userId, u);
-    return { id: u.id, email: u.email, username: u.username };
+
+    if (email) {
+      const existing = await pool.query(
+        'SELECT id FROM "User" WHERE email = $1 AND id != $2',
+        [email, userId]
+      );
+
+      if ((existing.rowCount ?? 0) > 0) {
+        throw new Error("Email already in use");
+      }
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE "User"
+      SET
+        email = COALESCE($1, email),
+        username = COALESCE($2, username),
+        "updatedAt" = NOW()
+      WHERE id = $3
+      RETURNING id, email, username
+      `,
+      [email ?? null, username ?? null, userId]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      throw new Error("User not found");
+    }
+
+    return result.rows[0];
   }
 }
 

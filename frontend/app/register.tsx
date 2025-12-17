@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RegisterCard from "../components/RegisterCard";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { register } from "../store/slices/authSlice";
+import { registerUser } from "../store/slices/authSlice";
 
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
@@ -43,7 +43,7 @@ const RegisterScreen: React.FC = () => {
                 password: string;
                 username: string;
               }) => {
-                dispatch(register(vals));
+                dispatch(registerUser(vals));
               }}
               onLoginPress={() => router.push("/login")}
             />
@@ -93,7 +93,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomSection: {
-    // ensure RegisterCard sits at the bottom area and stretches horizontally
     alignSelf: "stretch",
     marginTop: "auto",
     marginBottom: 24,

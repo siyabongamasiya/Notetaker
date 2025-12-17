@@ -5,7 +5,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoginCard from "../components/LoginCard";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { login } from "../store/slices/authSlice";
+import { loginUser } from "../store/slices/authSlice";
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
@@ -45,7 +45,7 @@ const LoginScreen: React.FC = () => {
           <View style={styles.bottomSection}>
             <LoginCard
               onSubmit={(values: { email: string; password: string }) => {
-                dispatch(login(values));
+                dispatch(loginUser(values));
               }}
               onRegisterPress={() => router.push("/register")}
             />

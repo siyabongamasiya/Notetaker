@@ -17,6 +17,7 @@ export class NoteController {
         content,
         category
       );
+
       return res.status(201).json(note);
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
@@ -51,13 +52,9 @@ export class NoteController {
       const { id } = req.params;
 
       const note = await noteService.getNoteById(id, userId);
-      if (!note) {
-        return res.status(404).json({ error: "Note not found" });
-      }
-
       return res.status(200).json(note);
     } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+      return res.status(404).json({ error: error.message });
     }
   }
 
@@ -74,6 +71,7 @@ export class NoteController {
         content,
         category
       );
+
       return res.status(200).json(note);
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
@@ -102,6 +100,7 @@ export class NoteController {
       }
 
       const notes = await noteService.searchNotes(userId, query as string);
+
       return res.status(200).json(notes);
     } catch (error: any) {
       return res.status(400).json({ error: error.message });

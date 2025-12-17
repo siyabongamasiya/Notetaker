@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export type User = {
   id: string;
@@ -8,71 +9,137 @@ export type User = {
 
 type AuthState = {
   user: User | null;
-  token?: string | null; // dummy token
+  token: string | null;
+  loading: boolean;
+  error: string | null;
 };
 
 const initialState: AuthState = {
   user: null,
   token: null,
+  loading: false,
+  error: null,
 };
+
+/* ================== THUNKS ================== */
+
+// Register
+export const registerUser = createAsyncThunk(
+  "auth/registerUser",
+  async (
+    {
+      email,
+      username,
+      password,
+    }: { email: string; username: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await axios.post(" http://localhost:4000/api/auth/register", {
+        email,
+        username,
+        password,
+      });
+      localStorage.setItem("token", res.data.token);
+      return res.data;
+    } catch (e: any) {
+      return rejectWithValue(
+        e.response?.data?.message || "Registration failed"
+      );
+    }
+  }
+);
+
+// Login
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await axios.post(" http://localhost:4000/api/auth/login", {
+        email,
+        password,
+      });
+      localStorage.setItem("token", res.data.token);
+      return res.data;
+    } catch (e: any) {
+      return rejectWithValue(e.response?.data?.message || "Login failed");
+    }
+  }
+);
+
+// Update Profile
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (
+    { email, username }: { email?: string; username?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await axios.put(" http://localhost:4000/api/auth/profile", {
+        email,
+        username,
+      });
+      return res.data;
+    } catch (e: any) {
+      return rejectWithValue(e.response?.data?.message || "Update failed");
+    }
+  }
+);
+
+/* ================== SLICE ================== */
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    register: (
-      state,
-      action: PayloadAction<{
-        email: string;
-        password: string;
-        username: string;
-      }>
-    ) => {
-      // dummy registration: store user locally
-      const id = String(Date.now());
-      state.user = {
-        id,
-        email: action.payload.email,
-        username: action.payload.username,
-      };
-      state.token = `token-${id}`;
-    },
-    login: (
-      state,
-      action: PayloadAction<{ email: string; password: string }>
-    ) => {
-      // dummy login: accept any credentials
-      const id = String(Date.now());
-      state.user = {
-        id,
-        email: action.payload.email,
-        username: action.payload.email.split("@")[0],
-      };
-      state.token = `token-${id}`;
-    },
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.error = null;
+      localStorage.removeItem("token");
     },
-    updateProfile: (
-      state,
-      action: PayloadAction<{
-        email?: string;
-        username?: string;
-        password?: string;
-      }>
-    ) => {
-      if (!state.user) return;
-      state.user = {
-        ...state.user,
-        ...(action.payload.email ? { email: action.payload.email } : {}),
-        ...(action.payload.username
-          ? { username: action.payload.username }
-          : {}),
-      };
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Register
+      .addCase(registerUser.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(registerUser.fulfilled, (s, a) => {
+        s.loading = false;
+        s.user = a.payload.user;
+        s.token = a.payload.token;
+      })
+      .addCase(registerUser.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload as string;
+      })
+
+      // Login
+      .addCase(loginUser.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
+      .addCase(loginUser.fulfilled, (s, a) => {
+        s.loading = false;
+        s.user = a.payload.user;
+        s.token = a.payload.token;
+      })
+      .addCase(loginUser.rejected, (s, a) => {
+        s.loading = false;
+        s.error = a.payload as string;
+      })
+
+      // Update Profile
+      .addCase(updateProfile.fulfilled, (s, a) => {
+        s.user = a.payload;
+      });
   },
 });
 
-export const { register, login, logout, updateProfile } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

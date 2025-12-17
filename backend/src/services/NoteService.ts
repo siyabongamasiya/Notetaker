@@ -1,57 +1,71 @@
 import { v4 as uuidv4 } from "uuid";
+import { pool } from "../db";
 
-type NoteRecord = {
-  id: string;
-  title: string;
-  content: string;
-  category: string;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const notes = new Map<string, NoteRecord>();
-
-export class NoteService {
+export class NotesService {
   async createNote(
     userId: string,
     title: string,
     content: string,
-    category: string = "personal"
+    category?: string
   ) {
     const id = uuidv4();
-    const now = new Date().toISOString();
-    const record: NoteRecord = {
-      id,
-      title,
-      content,
-      category: category.toLowerCase(),
-      userId,
-      createdAt: now,
-      updatedAt: now,
-    };
-    notes.set(id, record);
-    return record;
+    const now = new Date(); // timestamp for createdAt and updatedAt
+
+    const result = await pool.query(
+      `
+      INSERT INTO "Note" (id, "userId", title, content, category, "createdAt", "updatedAt")
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+      `,
+      [id, userId, title, content, category ?? null, now, now]
+    );
+
+    return result.rows[0];
   }
 
   async getNotesByUser(userId: string) {
-    return Array.from(notes.values())
-      .filter((n) => n.userId === userId)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM "Note"
+      WHERE "userId" = $1
+      ORDER BY "createdAt" DESC
+      `,
+      [userId]
+    );
 
-  async getNoteById(noteId: string, userId: string) {
-    const n = notes.get(noteId);
-    if (!n || n.userId !== userId) return null;
-    return n;
+    return result.rows;
   }
 
   async getNotesByCategory(userId: string, category: string) {
-    return Array.from(notes.values())
-      .filter(
-        (n) => n.userId === userId && n.category === category.toLowerCase()
-      )
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM "Note"
+      WHERE "userId" = $1 AND category = $2
+      ORDER BY "createdAt" DESC
+      `,
+      [userId, category]
+    );
+
+    return result.rows;
+  }
+
+  async getNoteById(noteId: string, userId: string) {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM "Note"
+      WHERE id = $1 AND "userId" = $2
+      `,
+      [noteId, userId]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      throw new Error("Note not found");
+    }
+
+    return result.rows[0];
   }
 
   async updateNote(
@@ -61,34 +75,57 @@ export class NoteService {
     content?: string,
     category?: string
   ) {
-    const n = await this.getNoteById(noteId, userId);
-    if (!n) throw new Error("Note not found");
-    if (title !== undefined) n.title = title;
-    if (content !== undefined) n.content = content;
-    if (category !== undefined) n.category = category.toLowerCase();
-    n.updatedAt = new Date().toISOString();
-    notes.set(noteId, n);
-    return n;
+    const result = await pool.query(
+      `
+      UPDATE "Note"
+      SET
+        title = COALESCE($1, title),
+        content = COALESCE($2, content),
+        category = COALESCE($3, category),
+        "updatedAt" = NOW()
+      WHERE id = $4 AND "userId" = $5
+      RETURNING *
+      `,
+      [title ?? null, content ?? null, category ?? null, noteId, userId]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      throw new Error("Note not found");
+    }
+
+    return result.rows[0];
   }
 
   async deleteNote(noteId: string, userId: string) {
-    const n = await this.getNoteById(noteId, userId);
-    if (!n) throw new Error("Note not found");
-    notes.delete(noteId);
-    return;
+    const result = await pool.query(
+      `
+      DELETE FROM "Note"
+      WHERE id = $1 AND "userId" = $2
+      `,
+      [noteId, userId]
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      throw new Error("Note not found");
+    }
+
+    return { success: true };
   }
 
   async searchNotes(userId: string, query: string) {
-    const q = query.toLowerCase();
-    return Array.from(notes.values())
-      .filter(
-        (n) =>
-          n.userId === userId &&
-          (n.title.toLowerCase().includes(q) ||
-            n.content.toLowerCase().includes(q))
-      )
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM "Note"
+      WHERE "userId" = $1
+        AND (title ILIKE $2 OR content ILIKE $2)
+      ORDER BY "createdAt" DESC
+      `,
+      [userId, `%${query}%`]
+    );
+
+    return result.rows;
   }
 }
 
-export const noteService = new NoteService();
+export const noteService = new NotesService();
