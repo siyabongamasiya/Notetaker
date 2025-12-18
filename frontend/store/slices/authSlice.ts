@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "@/services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type User = {
   id: string;
@@ -35,12 +36,12 @@ export const registerUser = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post(" http://localhost:4000/api/auth/register", {
+      const res = await api.post("/auth/register", {
         email,
         username,
         password,
       });
-      localStorage.setItem("token", res.data.token);
+      await AsyncStorage.setItem("token", res.data.token);
       return res.data;
     } catch (e: any) {
       return rejectWithValue(
@@ -58,14 +59,26 @@ export const loginUser = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post(" http://localhost:4000/api/auth/login", {
-        email,
-        password,
-      });
-      localStorage.setItem("token", res.data.token);
+      const res = await api.post("/auth/login", { email, password });
+      await AsyncStorage.setItem("token", res.data.token);
       return res.data;
     } catch (e: any) {
       return rejectWithValue(e.response?.data?.message || "Login failed");
+    }
+  }
+);
+
+// Get Profile
+export const getProfile = createAsyncThunk(
+  "auth/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get("/auth/profile");
+      return res.data;
+    } catch (e: any) {
+      return rejectWithValue(
+        e.response?.data?.message || "Failed to get profile"
+      );
     }
   }
 );
@@ -78,10 +91,7 @@ export const updateProfile = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.put(" http://localhost:4000/api/auth/profile", {
-        email,
-        username,
-      });
+      const res = await api.put("/auth/profile", { email, username });
       return res.data;
     } catch (e: any) {
       return rejectWithValue(e.response?.data?.message || "Update failed");
@@ -99,7 +109,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
-      localStorage.removeItem("token");
+      AsyncStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -132,6 +142,11 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload as string;
+      })
+
+      // Get Profile
+      .addCase(getProfile.fulfilled, (s, a) => {
+        s.user = a.payload;
       })
 
       // Update Profile

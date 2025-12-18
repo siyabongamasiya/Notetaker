@@ -12,33 +12,48 @@ import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { addNote } from "../store/slices/notesSlice";
-import { RootState } from "@/store";
+import { createNote } from "../store/slices/notesSlice";
 
-const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
+const CATEGORY_OPTIONS = [
+  { label: "Work", value: "work" },
+  { label: "Study", value: "study" },
+  { label: "Personal", value: "personal" },
+] as const;
+
+type Category = "work" | "study" | "personal";
 
 const AddNoteScreen: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<string>("Work");
+  const [category, setCategory] = useState<Category>("work");
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
 
+  /* ---------------- AUTH GUARD ---------------- */
+
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  const handleSave = () => {
-    dispatch(
-      addNote({ title, content, category: category.toLowerCase() as any })
-    );
-    if ((router as any).back) {
-      (router as any).back();
-    } else {
-      router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+  /* ---------------- SAVE NOTE ---------------- */
+
+  const handleSave = async () => {
+    if (!content.trim()) return;
+    try {
+      await dispatch(
+        createNote({
+          title: title.trim() || undefined,
+          content: content.trim(),
+          category,
+        })
+      ).unwrap();
+
+      router.replace(`/ViewNotes?category=${category}`);
+    } catch (error) {
+      console.error("Error creating note:", error);
     }
   };
 
@@ -50,7 +65,7 @@ const AddNoteScreen: React.FC = () => {
       >
         <SimpleTopCard
           title="Add note"
-          onBack={() => (router.back ? router.back() : router.replace("/home"))}
+          onBack={() => router.replace(`/ViewNotes?category=${category}`)}
         />
 
         <View style={styles.form}>
@@ -63,13 +78,15 @@ const AddNoteScreen: React.FC = () => {
 
           <EditText
             label="Content"
-            placeholder="Write you note here..."
+            placeholder="Write your note here..."
             value={content}
             onChangeText={setContent}
             multiline
             numberOfLines={6}
             inputStyle={{ height: 140, textAlignVertical: "top" }}
           />
+
+          {/* -------- CATEGORY DROPDOWN -------- */}
 
           <View style={styles.field}>
             <Text style={styles.label}>Category</Text>
@@ -80,7 +97,9 @@ const AddNoteScreen: React.FC = () => {
                 onPress={() => setOpen((s) => !s)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.triggerText}>{category}</Text>
+                <Text style={styles.triggerText}>
+                  {CATEGORY_OPTIONS.find((c) => c.value === category)?.label}
+                </Text>
                 <Text style={styles.arrow}>{open ? "▲" : "▼"}</Text>
               </TouchableOpacity>
 
@@ -88,15 +107,15 @@ const AddNoteScreen: React.FC = () => {
                 <View style={styles.options}>
                   {CATEGORY_OPTIONS.map((opt) => (
                     <TouchableOpacity
-                      key={opt}
+                      key={opt.value}
                       style={styles.option}
                       onPress={() => {
-                        setCategory(opt);
+                        setCategory(opt.value);
                         setOpen(false);
                       }}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.optionText}>{opt}</Text>
+                      <Text style={styles.optionText}>{opt.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -112,6 +131,8 @@ const AddNoteScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
+
+/* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F8F5FE" },
@@ -146,7 +167,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    minWidth: 140,
   },
   triggerText: {
     color: "#111827",

@@ -18,6 +18,7 @@ const ProfileScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
 
+  // Prefill username & email from store
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
@@ -26,7 +27,14 @@ const ProfileScreen: React.FC = () => {
   }, [user]);
 
   const handleSave = () => {
-    dispatch(updateProfile({ email, username, password }));
+    // Only send password if it is set
+    const payload: { username?: string; email?: string; password?: string } = {
+      username,
+      email,
+    };
+    if (password) payload.password = password;
+
+    dispatch(updateProfile(payload));
     if ((router as any).back) {
       (router as any).back();
     } else {

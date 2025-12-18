@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,88 +9,44 @@ import Sorter from "../components/Sorter";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { deleteNote, Note } from "../store/slices/notesSlice";
 
-const CATEGORY_COLORS: Record<string, string> = {
+/* ---------------- CATEGORY COLORS ---------------- */
+
+const CATEGORY_COLORS: Record<"all" | "work" | "study" | "personal", string> = {
+  all: "#6B7280",
   work: "#3B7DFF",
   study: "#AA48FF",
   personal: "#E70076",
 };
 
-const SAMPLE_NOTES = [
-  {
-    id: "1",
-    category: "work",
-    title: "Design review",
-    description: "Review the new UI designs and give feedback.",
-    date: new Date(),
-  },
-  {
-    id: "2",
-    category: "study",
-    title: "Math notes",
-    description: "Summarize chapter 4 on integrals.",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-  },
-  {
-    id: "3",
-    category: "personal",
-    title: "Grocery list",
-    description: "Buy milk, eggs, and bread.",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
-  },
-  {
-    id: "4",
-    category: "work",
-    title: "Sprint plan",
-    description: "Prepare sprint plan for next week.",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1),
-  },
-];
-
 const ViewNotesScreen: React.FC = () => {
   const router = useRouter();
-  // try to read a `category` param from the router params if available,
-  // fall back to "work" when not provided. expo-router may expose
-  // params differently depending on routing setup, so use a safe any-cast.
-  const params = (router as any).params ?? {};
-  // Prefer router.searchParams if available, else params, else parse URL query string
-  const rawCategoryFromSearch = (router as any).searchParams?.category as
-    | string
-    | undefined;
-  const rawCategoryFromPath = (() => {
-    try {
-      const path = (router as any).pathname as string | undefined;
-      if (!path) return undefined;
-      const idx = path.indexOf("?");
-      if (idx === -1) return undefined;
-      const qs = path.slice(idx + 1);
-      const usp = new URLSearchParams(qs);
-      return usp.get("category") || undefined;
-    } catch {
-      return undefined;
-    }
-  })();
+  const { category } = useLocalSearchParams<{ category?: string }>();
 
-  const rawCategory =
-    rawCategoryFromSearch || (params.category as string) || rawCategoryFromPath;
   const selectedCategory = (
-    rawCategory ? String(rawCategory) : "all"
-  ).toLowerCase();
+    category ? String(category) : "all"
+  ).toLowerCase() as "all" | "work" | "study" | "personal";
+
   const [order, setOrder] = useState<"newest" | "oldest">("newest");
   const [query, setQuery] = useState("");
+
+  const dispatch = useAppDispatch();
   const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
   const user = useAppSelector((s) => s.auth.user);
+
+  /* ---------------- AUTH GUARD ---------------- */
 
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  const color = CATEGORY_COLORS[selectedCategory] || "#3B7DFF";
+  /* ---------------- FILTER + SORT ---------------- */
 
   const notes = useMemo(() => {
     const base =
       selectedCategory === "all"
         ? notesAll
         : notesAll.filter((n) => n.category === selectedCategory);
+
     const searched = query
       ? base.filter((n) => {
           const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -99,28 +55,36 @@ const ViewNotesScreen: React.FC = () => {
           );
         })
       : base;
-    const sorted = [...searched].sort((a, b) => {
-      if (order === "newest")
-        return +new Date(b.dateAdded) - +new Date(a.dateAdded);
-      return +new Date(a.dateAdded) - +new Date(b.dateAdded);
+
+    return [...searched].sort((a, b) => {
+      if (order === "newest") {
+        return +new Date(b.createdAt) - +new Date(a.createdAt);
+      }
+      return +new Date(a.createdAt) - +new Date(b.createdAt);
     });
-    return sorted;
   }, [notesAll, selectedCategory, order, query]);
-  const dispatch = useAppDispatch();
+
+  const color = CATEGORY_COLORS[selectedCategory];
+
+  /* ---------------- RENDER ---------------- */
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
       <ScrollView contentContainerStyle={styles.container}>
         <NotesTopCard
-          title={`${selectedCategory[0].toUpperCase()}${selectedCategory.slice(
-            1
-          )} Notes`}
-          category={selectedCategory as any}
-          onSearch={(t) => setQuery(t)}
+          title={
+            selectedCategory === "all"
+              ? "All Notes"
+              : `${selectedCategory[0].toUpperCase()}${selectedCategory.slice(
+                  1
+                )} Notes`
+          }
+          category={selectedCategory}
+          onSearch={setQuery}
         />
 
         <View style={styles.controlsRow}>
-          <Sorter value={order} onChange={(o) => setOrder(o)} />
+          <Sorter value={order} onChange={setOrder} />
         </View>
 
         {query ? (
@@ -135,24 +99,20 @@ const ViewNotesScreen: React.FC = () => {
               key={n.id}
               title={n.title || ""}
               description={n.content}
-              date={new Date(n.dateAdded)}
+              date={new Date(n.createdAt)}
               onPress={() => router.push(`/Edit_note?id=${n.id}`)}
-              onDelete={() => dispatch(deleteNote({ id: n.id }))}
+              onDelete={() => dispatch(deleteNote(n.id))}
             />
           ))}
         </View>
       </ScrollView>
 
-      <AddNoteFab
-        color={color}
-        onPress={() => {
-          const current = (router as any).pathname || "";
-          if (current !== "/Add_Note") router.push("/Add_Note");
-        }}
-      />
+      <AddNoteFab color={color} onPress={() => router.push("/Add_Note")} />
     </SafeAreaView>
   );
 };
+
+/* ---------------- STYLES ---------------- */
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },

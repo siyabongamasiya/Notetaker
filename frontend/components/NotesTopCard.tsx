@@ -9,13 +9,12 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-// removed expo-linear-gradient to use solid background color
 import { Ionicons } from "@expo/vector-icons";
 
 export type NotesTopCardProps = {
   title: string;
   onBack?: () => void;
-  category: "work" | "study" | "personal";
+  category: "all" | "work" | "study" | "personal";
   style?: StyleProp<ViewStyle>;
   borderRadius?: number;
   backSquareSize?: number;
@@ -23,43 +22,45 @@ export type NotesTopCardProps = {
   onSearch?: (text: string) => void;
 };
 
-// Helper: blend mid color between two hex colors
+/* ---------------- COLOR HELPERS ---------------- */
+
 function parseHexColor(hex: string): [number, number, number] | null {
-  const normalized = hex.trim().replace(/^#/, "");
-  if (normalized.length === 3) {
-    const r = parseInt(normalized[0] + normalized[0], 16);
-    const g = parseInt(normalized[1] + normalized[1], 16);
-    const b = parseInt(normalized[2] + normalized[2], 16);
-    return [r, g, b];
-  }
+  const normalized = hex.replace("#", "");
   if (normalized.length === 6) {
-    const r = parseInt(normalized.slice(0, 2), 16);
-    const g = parseInt(normalized.slice(2, 4), 16);
-    const b = parseInt(normalized.slice(4, 6), 16);
-    return [r, g, b];
+    return [
+      parseInt(normalized.slice(0, 2), 16),
+      parseInt(normalized.slice(2, 4), 16),
+      parseInt(normalized.slice(4, 6), 16),
+    ];
   }
   return null;
 }
-function toHex(n: number): string {
-  const clamped = Math.max(0, Math.min(255, Math.round(n)));
-  return clamped.toString(16).padStart(2, "0");
-}
-function blendMidColor(c1: string, c2: string): string | null {
-  const a = parseHexColor(c1);
-  const b = parseHexColor(c2);
-  if (!a || !b) return null;
-  const r = (a[0] + b[0]) / 2;
-  const g = (a[1] + b[1]) / 2;
-  const bl = (a[2] + b[2]) / 2;
-  return `#${toHex(r)}${toHex(g)}${toHex(bl)}`;
+
+function toHex(n: number) {
+  return Math.round(Math.max(0, Math.min(255, n)))
+    .toString(16)
+    .padStart(2, "0");
 }
 
-// Map category to gradient color
-const categoryColors: Record<string, string> = {
+function blendMidColor(c1: string, c2: string): string {
+  const a = parseHexColor(c1);
+  const b = parseHexColor(c2);
+  if (!a || !b) return c1;
+  return `#${toHex((a[0] + b[0]) / 2)}${toHex((a[1] + b[1]) / 2)}${toHex(
+    (a[2] + b[2]) / 2
+  )}`;
+}
+
+/* ---------------- CATEGORY COLORS ---------------- */
+
+const categoryColors: Record<NotesTopCardProps["category"], string> = {
+  all: "#6B7280",
   work: "#3B7DFF",
   study: "#AA48FF",
   personal: "#E70076",
 };
+
+/* ---------------- COMPONENT ---------------- */
 
 const NotesTopCard: React.FC<NotesTopCardProps> = ({
   title,
@@ -74,15 +75,12 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
   const [searchText, setSearchText] = useState("");
   const router = useRouter();
 
-  const startColor = categoryColors[category] || "#3B7DFF";
-  const endColor = blendMidColor(startColor, "#FFFFFF") || startColor;
+  const startColor = categoryColors[category];
+  const endColor = blendMidColor(startColor, "#FFFFFF");
 
-  const gradientConfig = useMemo(() => {
-    const mid = blendMidColor(startColor, endColor);
-    return mid
-      ? { colors: [startColor, mid, endColor], locations: [0, 0.5, 1] as const }
-      : { colors: [startColor, endColor] };
-  }, [startColor, endColor]);
+  useMemo(() => {
+    blendMidColor(startColor, endColor);
+  }, [startColor]);
 
   return (
     <View
@@ -96,9 +94,8 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
         <TouchableOpacity
           onPress={() => {
             if (onBack) return onBack();
-            // fall back to router.back() when available
             if ((router as any).back) return (router as any).back();
-            return router.replace("/home");
+            router.replace("/home");
           }}
           activeOpacity={0.8}
           style={[
@@ -118,22 +115,22 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
         </Text>
       </View>
 
-      {/* Search Bar */}
+      {/* Search */}
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
           size={20}
-          color="#9CA3AF"
+          color="#E5E7EB"
           style={{ marginRight: 8 }}
         />
         <TextInput
           placeholder="Search notes..."
-          placeholderTextColor="#D1D5DB"
+          placeholderTextColor="#E5E7EB"
           style={styles.searchInput}
           value={searchText}
           onChangeText={(text) => {
             setSearchText(text);
-            onSearch && onSearch(text);
+            onSearch?.(text);
           }}
         />
       </View>
@@ -141,10 +138,12 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
   );
 };
 
+/* ---------------- STYLES ---------------- */
+
 const styles = StyleSheet.create({
   card: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   row: {
     flexDirection: "row",
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
   backSquare: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(249, 250, 252, 0.4)",
+    backgroundColor: "rgba(255,255,255,0.25)",
   },
   title: {
     flex: 1,
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: "rgba(255,255,255,0.18)",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,

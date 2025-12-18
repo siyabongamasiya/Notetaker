@@ -25,7 +25,7 @@ const LoginCard: React.FC<LoginCardProps> = ({
   const [email, setEmail] = React.useState(initialEmail);
   const [password, setPassword] = React.useState(initialPassword);
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     onSubmit?.({ email, password });
   };
 

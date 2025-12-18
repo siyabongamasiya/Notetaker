@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -12,45 +12,60 @@ import Button from "../components/shared/Button";
 import EditText from "../components/shared/EditText";
 import SimpleTopCard from "../components/shared/SimpleTopCard";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { Note, updateNote } from "../store/slices/notesSlice";
+import { Note, fetchNoteById, updateNote } from "../store/slices/notesSlice";
 
 const CATEGORY_OPTIONS = ["Work", "Study", "Personal"];
 
 const EditNoteScreen: React.FC = () => {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const id = params.id as string | undefined;
+
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
+  const selectedNote = useAppSelector((s) => s.notes.selectedNote);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<string>("Work");
   const [open, setOpen] = useState(false);
 
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((s) => s.auth.user);
-  const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
-  const params = (router as any).params ?? {};
-  const id = params.id as string | undefined;
-
+  // Redirect if not logged in
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
+  // Fetch note by ID on mount
   useEffect(() => {
     if (id) {
-      const n = notesAll.find((x) => x.id === id);
-      if (n) {
-        setTitle(n.title || "");
-        setContent(n.content);
-        setCategory(n.category.charAt(0).toUpperCase() + n.category.slice(1));
-      }
+      dispatch(fetchNoteById(id));
     }
-  }, [id, notesAll]);
+  }, [id]);
+
+  // Update local state when selectedNote changes
+  useEffect(() => {
+    if (selectedNote) {
+      setTitle(selectedNote.title || "");
+      setContent(selectedNote.content);
+      setCategory(
+        selectedNote.category.charAt(0).toUpperCase() +
+          selectedNote.category.slice(1)
+      );
+    }
+  }, [selectedNote]);
 
   const handleSave = () => {
+    if (!id) return;
+
     dispatch(
       updateNote({
-        id: id || String(Date.now()),
-        changes: { title, content, category: category.toLowerCase() as any },
+        id,
+        title,
+        content,
+        category: category.toLowerCase() as any,
       })
     );
+
     if ((router as any).back) {
       (router as any).back();
     } else {
@@ -65,8 +80,12 @@ const EditNoteScreen: React.FC = () => {
         keyboardShouldPersistTaps="handled"
       >
         <SimpleTopCard
-          title="Edit note"
-          onBack={() => (router.back ? router.back() : router.replace("/home"))}
+          title="Edit Note"
+          onBack={() =>
+            (router as any).back
+              ? (router as any).back()
+              : router.replace("/home")
+          }
         />
 
         <View style={styles.form}>
@@ -79,7 +98,7 @@ const EditNoteScreen: React.FC = () => {
 
           <EditText
             label="Content"
-            placeholder="Write you note here..."
+            placeholder="Write your note here..."
             value={content}
             onChangeText={setContent}
             multiline
@@ -121,19 +140,7 @@ const EditNoteScreen: React.FC = () => {
           </View>
 
           <View style={styles.saveBtnWrap}>
-            <Button
-              text="Save Changes"
-              onPress={() => {
-                handleSave();
-                if ((router as any).back) {
-                  (router as any).back();
-                } else {
-                  router.replace(
-                    `/ViewNotes?category=${category.toLowerCase()}`
-                  );
-                }
-              }}
-            />
+            <Button text="Save Changes" onPress={handleSave} />
           </View>
         </View>
       </ScrollView>

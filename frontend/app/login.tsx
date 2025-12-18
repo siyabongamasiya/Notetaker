@@ -12,6 +12,19 @@ const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
 
+  const handleLogin = async (values: { email: string; password: string }) => {
+    try {
+      const result = await dispatch(loginUser(values)).unwrap();
+      if (result.user) {
+        router.replace("/home");
+      }
+    } catch (error: any) {
+      console.log("Login error:", error);
+      alert(error || "Login failed");
+    }
+  };
+
+
   React.useEffect(() => {
     if (user) router.replace("/home");
   }, [user]);
@@ -44,9 +57,7 @@ const LoginScreen: React.FC = () => {
 
           <View style={styles.bottomSection}>
             <LoginCard
-              onSubmit={(values: { email: string; password: string }) => {
-                dispatch(loginUser(values));
-              }}
+              onSubmit={handleLogin}
               onRegisterPress={() => router.push("/register")}
             />
           </View>
