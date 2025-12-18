@@ -51,7 +51,7 @@ function blendMidColor(c1: string, c2: string): string {
   )}`;
 }
 
-/* ---------------- CATEGORY COLORS ---------------- */
+/* CATEGORY COLORS*/
 
 const categoryColors: Record<NotesTopCardProps["category"], string> = {
   All: "#6B7280",
@@ -59,8 +59,6 @@ const categoryColors: Record<NotesTopCardProps["category"], string> = {
   Study: "#AA48FF",
   Personal: "#E70076",
 };
-
-/* ---------------- COMPONENT ---------------- */
 
 const NotesTopCard: React.FC<NotesTopCardProps> = ({
   title,
@@ -138,7 +136,7 @@ const NotesTopCard: React.FC<NotesTopCardProps> = ({
   );
 };
 
-/* ---------------- STYLES ---------------- */
+/* STYLES*/
 
 const styles = StyleSheet.create({
   card: {

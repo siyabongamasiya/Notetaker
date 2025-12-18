@@ -10,7 +10,6 @@ authRouter.post("/login", (req: Request, res: Response) =>
   authController.login(req, res)
 );
 
-// Protected routes
 authRouter.get("/profile", authMiddleware, (req : Request, res : Response) =>
   authController.getProfile(req, res)
 );

@@ -11,13 +11,13 @@ import {
 export type CategoryCardProps = {
   name: 'work' | 'study' | 'personal' | string;
   count: number;
-  icon?: React.ReactNode; // Icon element to render inside the colored square
-  color?: string; // Background color for the square; defaults by name when omitted
+  icon?: React.ReactNode; 
+  color?: string; 
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   squareSize?: number;
-  borderRadius?: number; // Card radius
-  squareRadius?: number; // Square radius
+  borderRadius?: number; 
+  squareRadius?: number; 
 };
 
 const DEFAULT_COLORS: Record<string, string> = {
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 12,
-    // subtle shadow
     shadowColor: '#000',
     shadowOpacity: 0.06,
     shadowRadius: 8,

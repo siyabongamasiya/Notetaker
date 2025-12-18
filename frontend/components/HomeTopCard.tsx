@@ -7,12 +7,11 @@ export type HomeTopCardProps = {
   profileImageUri?: string;
   style?: StyleProp<ViewStyle>;
   borderRadius?: number;
-  startColor?: ColorValue; // gradient start (defaults to #3B7DFF)
-  endColor?: ColorValue;   // gradient end (defaults to #AA48FF)
+  startColor?: ColorValue; 
+  endColor?: ColorValue;   
   onProfilePress?: () => void;
 };
 
-// helpers to blend mid color similar to Button gradient
 function parseHexColor(hex: string): [number, number, number] | null {
   const normalized = hex.trim().replace(/^#/, '');
   if (normalized.length === 3) {

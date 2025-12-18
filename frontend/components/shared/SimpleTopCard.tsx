@@ -8,13 +8,13 @@ export type SimpleTopCardProps = {
   onBack?: () => void;
   style?: StyleProp<ViewStyle>;
   borderRadius?: number;
-  startColor?: ColorValue; // gradient start (defaults to #3B7DFF)
-  endColor?: ColorValue;   // gradient end (defaults to #AA48FF)
+  startColor?: ColorValue; 
+  endColor?: ColorValue;  
   backSquareSize?: number;
   backSquareRadius?: number;
 };
 
-// Helper: blend mid color between two hex colors (used to match button gradient feel)
+
 function parseHexColor(hex: string): [number, number, number] | null {
   const normalized = hex.trim().replace(/^#/, '');
   if (normalized.length === 3) {

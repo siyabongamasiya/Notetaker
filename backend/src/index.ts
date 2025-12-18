@@ -7,30 +7,18 @@ import { Request, Response } from "express";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/notes", notesRouter);
-// Health check
+
+
 app.get("/", (req: Request, res: Response) => {
   res.json({ status: "ok", message: "Notetaker backend running" });
 });
 
-// Auth endpoints (placeholder - Prisma to be integrated)
-// app.post("/api/auth/register", (req, res) => {
-//   res.json({ message: "Register - Prisma setup pending" });
-// });
 
-// app.post("/api/auth/login", (req, res) => {
-//   res.json({ message: "Login - Prisma setup pending" });
-// });
-
-// app.get("/api/notes", (req, res) => {
-//   res.json({ notes: [] });
-// });
-
-// Start server
 app.listen(PORT, () => {
   console.log(`✓ Backend listening on http://localhost:${PORT}`);
   console.log(`✓ API endpoints:`);

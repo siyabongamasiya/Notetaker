@@ -8,7 +8,7 @@ import {
 
 type AddNoteFabProps = {
   onPress: (event: GestureResponderEvent) => void;
-  color?: string; // background color
+  color?: string; 
 };
 
 const AddNoteFab: React.FC<AddNoteFabProps> = ({
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5, // Android shadow
-    shadowColor: "#000", // iOS shadow
+    elevation: 5, 
+    shadowColor: "#000", 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,

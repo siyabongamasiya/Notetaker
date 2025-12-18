@@ -9,7 +9,7 @@ export class NotesService {
     category?: string
   ) {
     const id = uuidv4();
-    const now = new Date(); // timestamp for createdAt and updatedAt
+    const now = new Date();
 
     const result = await pool.query(
       `

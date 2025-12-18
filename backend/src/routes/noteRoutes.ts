@@ -4,7 +4,6 @@ import { authMiddleware } from "../middleware/authMiddleware";
 import { Request, Response } from "express";
 const notesRouter = Router();
 
-// All note routes require authentication
 notesRouter.use(authMiddleware);
 
 notesRouter.post("/", (req : Request, res : Response) => noteController.createNote(req, res));

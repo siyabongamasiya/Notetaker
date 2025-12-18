@@ -32,7 +32,7 @@ const Sorter: React.FC<SorterProps> = ({ value, onChange }) => {
         <Text style={styles.arrow}>{open ? "▲" : "▼"}</Text>
       </TouchableOpacity>
 
-      {/* Dropdown options (NO "Date:" here) */}
+      
       {open && (
         <View style={styles.dropdown}>
           <TouchableOpacity

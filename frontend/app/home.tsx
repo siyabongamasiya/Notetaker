@@ -27,7 +27,7 @@ const HomeScreen: React.FC = () => {
       return;
     }
 
-    // fetch each category explicitly
+
     categories.forEach((c) => {
       dispatch(fetchNotesByCategory(c.key));
     });

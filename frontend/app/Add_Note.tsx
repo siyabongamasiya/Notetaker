@@ -32,13 +32,13 @@ const AddNoteScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
 
-  /* ---------------- AUTH GUARD ---------------- */
+  /* AUTH GUARD */
 
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  /* ---------------- SAVE NOTE ---------------- */
+  /* SAVE NOTE */
 
   const handleSave = async () => {
     if (!content.trim()) return;

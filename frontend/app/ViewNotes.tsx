@@ -7,7 +7,7 @@ import NoteItemCard from "../components/NoteItemCard";
 import NotesTopCard from "../components/NotesTopCard";
 import Sorter from "../components/Sorter";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { deleteNote, Note } from "../store/slices/notesSlice";
+import { deleteNote, fetchAllNotes, Note } from "../store/slices/notesSlice";
 
 const CATEGORY_COLORS: Record<"All" | "Work" | "Study" | "Personal", string> = {
   All: "#6B7280",
@@ -32,9 +32,15 @@ const ViewNotesScreen: React.FC = () => {
   const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
   const user = useAppSelector((s) => s.auth.user);
 
+  // Redirect if not logged in
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
+
+  // Fetch notes on mount
+  useEffect(() => {
+    dispatch(fetchAllNotes());
+  }, [dispatch]);
 
   const notes = useMemo(() => {
     const base =
@@ -60,7 +66,7 @@ const ViewNotesScreen: React.FC = () => {
   }, [notesAll, selectedCategory, order, query]);
 
   const color = CATEGORY_COLORS[selectedCategory];
-  // console.log(notesAll)
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>

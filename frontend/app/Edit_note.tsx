@@ -35,7 +35,6 @@ const EditNoteScreen: React.FC = () => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  // Fetch note by ID on mount
   useEffect(() => {
     if (id) {
       dispatch(fetchNoteById(id));

@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     padding: 20,
-    // light shadow
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,

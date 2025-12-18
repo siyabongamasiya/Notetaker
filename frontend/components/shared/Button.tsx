@@ -37,9 +37,9 @@ function blendMidColor(c1: string, c2: string): string | null {
 
 type ButtonProps = TouchableOpacityProps & {
   text?: string;
-  title?: string; // optional fallback for existing usages
+  title?: string; 
   onPress?: TouchableOpacityProps['onPress'];
-  onClick?: TouchableOpacityProps['onPress']; // alias for web-like naming
+  onClick?: TouchableOpacityProps['onPress']; 
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   disabled?: boolean;
