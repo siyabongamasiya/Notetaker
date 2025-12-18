@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RegisterCard from "../components/RegisterCard";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -28,7 +28,11 @@ const RegisterScreen: React.FC = () => {
           <View style={styles.topSection}>
             <View style={styles.brandColumn}>
               <View style={styles.logoBox}>
-                <Text style={styles.logoText}>Logo</Text>
+                <Image
+                  source={require("../assets/images/note-taker-app-icon-512.png")}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
               </View>
 
               <Text style={styles.title}>Create Account</Text>
@@ -76,6 +80,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
+  },
+  logo: {
+    width: 64,
+    height: 64,
   },
   logoText: {
     color: "#FFFFFF",

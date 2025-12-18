@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
 import {
   StyleProp,
   StyleSheet,
@@ -9,12 +10,11 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 export type NotesTopCardProps = {
   title: string;
   onBack?: () => void;
-  category: "all" | "work" | "study" | "personal";
+  category: "All" | "Work" | "Study" | "Personal";
   style?: StyleProp<ViewStyle>;
   borderRadius?: number;
   backSquareSize?: number;
@@ -54,10 +54,10 @@ function blendMidColor(c1: string, c2: string): string {
 /* ---------------- CATEGORY COLORS ---------------- */
 
 const categoryColors: Record<NotesTopCardProps["category"], string> = {
-  all: "#6B7280",
-  work: "#3B7DFF",
-  study: "#AA48FF",
-  personal: "#E70076",
+  All: "#6B7280",
+  Work: "#3B7DFF",
+  Study: "#AA48FF",
+  Personal: "#E70076",
 };
 
 /* ---------------- COMPONENT ---------------- */

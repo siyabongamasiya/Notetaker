@@ -1,4 +1,4 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,22 +9,21 @@ import Sorter from "../components/Sorter";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { deleteNote, Note } from "../store/slices/notesSlice";
 
-/* ---------------- CATEGORY COLORS ---------------- */
-
-const CATEGORY_COLORS: Record<"all" | "work" | "study" | "personal", string> = {
-  all: "#6B7280",
-  work: "#3B7DFF",
-  study: "#AA48FF",
-  personal: "#E70076",
+const CATEGORY_COLORS: Record<"All" | "Work" | "Study" | "Personal", string> = {
+  All: "#6B7280",
+  Work: "#3B7DFF",
+  Study: "#AA48FF",
+  Personal: "#E70076",
 };
 
 const ViewNotesScreen: React.FC = () => {
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category?: string }>();
-
-  const selectedCategory = (
-    category ? String(category) : "all"
-  ).toLowerCase() as "all" | "work" | "study" | "personal";
+  const selectedCategory = (category ?? "All") as
+    | "All"
+    | "Work"
+    | "Study"
+    | "Personal";
 
   const [order, setOrder] = useState<"newest" | "oldest">("newest");
   const [query, setQuery] = useState("");
@@ -33,17 +32,13 @@ const ViewNotesScreen: React.FC = () => {
   const notesAll = useAppSelector((s) => s.notes.notes) as Note[];
   const user = useAppSelector((s) => s.auth.user);
 
-  /* ---------------- AUTH GUARD ---------------- */
-
   useEffect(() => {
     if (!user) router.replace("/login");
   }, [user]);
 
-  /* ---------------- FILTER + SORT ---------------- */
-
   const notes = useMemo(() => {
     const base =
-      selectedCategory === "all"
+      selectedCategory === "All"
         ? notesAll
         : notesAll.filter((n) => n.category === selectedCategory);
 
@@ -65,19 +60,15 @@ const ViewNotesScreen: React.FC = () => {
   }, [notesAll, selectedCategory, order, query]);
 
   const color = CATEGORY_COLORS[selectedCategory];
-
-  /* ---------------- RENDER ---------------- */
-
+  // console.log(notesAll)
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>
+    <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
         <NotesTopCard
           title={
-            selectedCategory === "all"
+            selectedCategory === "All"
               ? "All Notes"
-              : `${selectedCategory[0].toUpperCase()}${selectedCategory.slice(
-                  1
-                )} Notes`
+              : `${selectedCategory} Notes`
           }
           category={selectedCategory}
           onSearch={setQuery}
@@ -88,9 +79,9 @@ const ViewNotesScreen: React.FC = () => {
         </View>
 
         {query ? (
-          <View style={{ marginTop: 8, marginBottom: 8 }}>
-            <Text style={{ color: "#374151" }}>{notes.length} result(s)</Text>
-          </View>
+          <Text style={{ marginBottom: 8, color: "#374151" }}>
+            {notes.length} result(s)
+          </Text>
         ) : null}
 
         <View style={styles.list}>
@@ -112,10 +103,8 @@ const ViewNotesScreen: React.FC = () => {
   );
 };
 
-/* ---------------- STYLES ---------------- */
-
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, backgroundColor: "#F8F5FE" },
   container: {
     paddingHorizontal: 20,
     paddingVertical: 20,

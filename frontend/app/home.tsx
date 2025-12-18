@@ -9,9 +9,9 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchNotesByCategory } from "../store/slices/notesSlice";
 
 const categories = [
-  { key: "work", icon: "briefcase-outline" },
-  { key: "study", icon: "book-outline" },
-  { key: "personal", icon: "heart-outline" },
+  { key: "Work", icon: "briefcase-outline" },
+  { key: "Study", icon: "book-outline" },
+  { key: "Personal", icon: "heart-outline" },
 ] as const;
 
 const HomeScreen: React.FC = () => {
@@ -31,7 +31,7 @@ const HomeScreen: React.FC = () => {
     categories.forEach((c) => {
       dispatch(fetchNotesByCategory(c.key));
     });
-  }, [user]);
+  }, []);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: "#F8F5FE" }]}>

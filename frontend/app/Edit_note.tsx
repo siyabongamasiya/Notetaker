@@ -62,14 +62,14 @@ const EditNoteScreen: React.FC = () => {
         id,
         title,
         content,
-        category: category.toLowerCase() as any,
+        category: category as any,
       })
     );
 
     if ((router as any).back) {
       (router as any).back();
     } else {
-      router.replace(`/ViewNotes?category=${category.toLowerCase()}`);
+      router.replace(`/ViewNotes?category=${category}`);
     }
   };
 

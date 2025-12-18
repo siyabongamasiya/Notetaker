@@ -5,7 +5,7 @@ const API_URL = "/notes"; // base handled in api.ts
 
 /* ================== TYPES ================== */
 
-export type Category = "work" | "study" | "personal";
+export type Category = "Work" | "Study" | "Personal";
 
 export type Note = {
   id: string;
@@ -29,9 +29,9 @@ type NotesState = {
 const initialState: NotesState = {
   notes: [],
   notesByCategory: {
-    work: [],
-    study: [],
-    personal: [],
+    Work: [],
+    Study: [],
+    Personal: [],
   },
   selectedNote: null,
   loading: false,
@@ -135,6 +135,7 @@ export const updateNote = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      console.log({ id, title, content, category });
       const res = await api.put(`${API_URL}/${id}`, {
         title,
         content,

@@ -15,17 +15,17 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { createNote } from "../store/slices/notesSlice";
 
 const CATEGORY_OPTIONS = [
-  { label: "Work", value: "work" },
-  { label: "Study", value: "study" },
-  { label: "Personal", value: "personal" },
+  { label: "Work", value: "Work" },
+  { label: "Study", value: "Study" },
+  { label: "Personal", value: "Personal" },
 ] as const;
 
-type Category = "work" | "study" | "personal";
+type Category = "Work" | "Study" | "Personal";
 
 const AddNoteScreen: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<Category>("work");
+  const [category, setCategory] = useState<Category>("Work");
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
