@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "@/services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
 
 export type User = {
   id: string;
@@ -23,7 +22,7 @@ const initialState: AuthState = {
   error: null,
 };
 
-/*THUNKS */
+/* ================== THUNKS ================== */
 
 // Register
 export const registerUser = createAsyncThunk(
@@ -100,7 +99,7 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-/*SLICE*/
+/* ================== SLICE ================== */
 
 const authSlice = createSlice({
   name: "auth",
@@ -115,85 +114,50 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      /* REGISTER*/
+      /* REGISTER */
       .addCase(registerUser.pending, (s) => {
         s.loading = true;
         s.error = null;
-        Toast.show({
-          type: "info",
-          text1: "Registering user...",
-          autoHide: false,
-        });
       })
       .addCase(registerUser.fulfilled, (s, a) => {
         s.loading = false;
         s.user = a.payload.user;
         s.token = a.payload.token;
-        Toast.hide();
-        Toast.show({ type: "success", text1: "Registration successful" });
       })
       .addCase(registerUser.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload as string;
-        Toast.hide();
-        Toast.show({ type: "error", text1: s.error });
       })
 
-      /*LOGIN*/
+      /* LOGIN */
       .addCase(loginUser.pending, (s) => {
         s.loading = true;
         s.error = null;
-        Toast.show({ type: "info", text1: "Logging in...", autoHide: false });
       })
       .addCase(loginUser.fulfilled, (s, a) => {
         s.loading = false;
         s.user = a.payload.user;
         s.token = a.payload.token;
-        Toast.hide();
-        Toast.show({ type: "success", text1: "Login successful" });
       })
       .addCase(loginUser.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload as string;
-        Toast.hide();
-        Toast.show({ type: "error", text1: s.error });
       })
 
-      /*GET PROFILE*/
-      .addCase(getProfile.pending, (s) => {
-        Toast.show({
-          type: "info",
-          text1: "Fetching profile...",
-          autoHide: false,
-        });
-      })
+      /* GET PROFILE */
       .addCase(getProfile.fulfilled, (s, a) => {
         s.user = a.payload;
-        Toast.hide();
       })
       .addCase(getProfile.rejected, (s, a) => {
         s.error = a.payload as string;
-        Toast.hide();
-        Toast.show({ type: "error", text1: s.error });
       })
 
-      /*UPDATE PROFILE*/
-      .addCase(updateProfile.pending, (s) => {
-        Toast.show({
-          type: "info",
-          text1: "Updating profile...",
-          autoHide: false,
-        });
-      })
+      /* UPDATE PROFILE */
       .addCase(updateProfile.fulfilled, (s, a) => {
         s.user = a.payload;
-        Toast.hide();
-        Toast.show({ type: "success", text1: "Profile updated" });
       })
       .addCase(updateProfile.rejected, (s, a) => {
         s.error = a.payload as string;
-        Toast.hide();
-        Toast.show({ type: "error", text1: s.error });
       });
   },
 });

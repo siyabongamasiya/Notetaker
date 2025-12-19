@@ -1,179 +1,161 @@
-# NoteTaker App
+# Note Taker
 
-Full-stack note-taking application built with **React Native/Expo** (frontend) and **Express.js + TypeScript** (backend).
+A modern, mobile-first notes application built to help users create, organize, edit, and manage notes efficiently.  
+The app focuses on clean UI, smooth user experience, and scalable architecture.
 
-## Project Structure
+## Design Screenshots
 
-```
-Notetaker/
-├── frontend/                   # React Native/Expo app
-│   ├── app/                   # File-based routing with expo-router
-│   ├── components/            # Reusable UI components
-│   ├── store/                 # Redux store (auth, notes slices)
-│   ├── package.json
-│   └── ...
-│
-├── backend/                   # Express.js TypeScript API
-│   ├── src/
-│   │   ├── index.ts           # Server entry point
-│   │   ├── controllers/       # Request handlers
-│   │   ├── services/          # Business logic
-│   │   ├── routes/            # API routes
-│   │   ├── middleware/        # JWT auth, CORS, etc.
-│   │   └── db.ts              # Prisma client
-│   ├── prisma/
-│   │   └── schema.prisma      # Database schema
-│   ├── .env                   # Configuration (DB, JWT secret)
-│   ├── package.json
-│   └── ...
-│
-└── README.md                  # This file
-```
+Below are the original design screens used to build the application.  
+These images are stored in the project and reflect the UI before development.
+
+### Login Screen
+![Login Screen](./frontend/assets/designs/login.jpg)
+
+### Register Screen
+![Register Screen](./frontend/assets/designs/register.jpg)
+
+### View Notes Screen
+![View Notes Screen](./frontend/assets/designs/viewnotes.jpg)
+
+### Add Note Screen
+![Add Note Screen](./frontend/assets/designs/add_note.jpg)
+
+### Edit Note Screen
+![Edit Note Screen](./frontend/assets/designs/edit%20note.jpg)
+
+### Home
+![Category Screen](./frontend/assets/designs/home.jpg)
+
+### Profile Screen
+![Profile Screen](./frontend/assets/designs/profile.jpg)
+
+---
+
+## Project Overview
+
+This application allows users to:
+- Create, edit, and delete notes
+- Categorize notes (Work, Study, Personal)
+- Search and sort notes
+- View notes by category
+- Experience real-time feedback via loading indicators and toast notifications
+
+The project follows a structured, component-driven development approach with a strong focus on performance, maintainability, and user experience.
+
+---
 
 ## Tech Stack
 
 ### Frontend
-
-- **React Native** + **Expo** — Mobile UI framework
-- **Redux Toolkit** — State management (auth, notes)
-- **expo-router** — File-based navigation
-- **TypeScript** — Type safety
+- **React Native**
+- **Expo (Expo Router)**
+- **TypeScript**
+- **Redux Toolkit** (State Management)
+- **Async Thunks** (API handling)
+- **React Native Toast Message** (User feedback)
+- **React Native Safe Area Context**
 
 ### Backend
+- **REST API** (Custom backend)
+- **JWT Authentication**
 
-- **Express.js** — REST API framework
-- **TypeScript** — Type safety
-- **Prisma** — ORM for PostgreSQL
-- **JWT** — Authentication
-- **bcryptjs** — Password hashing
-- **PostgreSQL** (via Neon) — Database
+### Design
+- **Figma**
+- **Figma Make (AI-assisted design)**
 
-## Quick Start
+### Tooling
+- **ChatGPT / Claude / GitHub Copilot**
+- **VS Code**
+- **Git & GitHub**
 
-### Prerequisites
+---
 
-- Node.js v18+
-- npm or yarn
-- PostgreSQL database (Neon URL provided in `.env`)
+## Development Process
 
-### Setup
+A detailed explanation of the full development process (planning → design → implementation → optimization → deployment) is documented here:
 
-#### Backend Setup
+**Development Process Document (Google Drive):**  
+[`Development Process`](https://docs.google.com/document/d/15L0YPfjK6bCwIItb4TaBNUb5TMdrL_-gYfVJ0nCk4uM/edit?usp=sharing)
 
-```bash
-cd backend
-npm install
-npm run build
-npm start
-```
+---
 
-Backend runs on `http://localhost:4000`
+## How to Use the App
 
-#### Frontend Setup
+### Download & Install
+- Download the APK file from the link below:
+  
+📦 **APK Download:**  
+👉 `PASTE APK DOWNLOAD LINK HERE`
 
-```bash
-cd frontend
-npm install
-npx expo start
-```
+- Enable **“Install from unknown sources”** on your Android device if prompted
+- Install and open the app
 
-Press `i` for iOS simulator or `a` for Android emulator.
-
-## API Endpoints
+---
 
 ### Authentication
+- Register a new account or log in with existing credentials
+- Authentication is required to access notes
 
-- `POST /api/auth/register` — Register new user
-- `POST /api/auth/login` — Login user
-- `GET /api/auth/profile` — Get user profile (protected)
-- `PUT /api/auth/profile` — Update profile (protected)
+---
 
-### Notes
+### Managing Notes
+- Add a new note using the **floating action button**
+- Edit notes by selecting them from the list
+- Delete notes when no longer needed
+- Filter notes by category
+- Search notes using keywords
+- Sort notes by newest or oldest
 
-- `POST /api/notes` — Create note (protected)
-- `GET /api/notes` — Get all user's notes (protected)
-- `GET /api/notes/:id` — Get note by ID (protected)
-- `PUT /api/notes/:id` — Update note (protected)
-- `DELETE /api/notes/:id` — Delete note (protected)
-- `GET /api/notes/category/:category` — Get notes by category (protected)
-- `GET /api/notes/search?query=...` — Search notes (protected)
+---
 
-## Environment Variables
+## Architecture & Structure
 
-### Backend (.env)
+- **Component-driven UI** for reusability and clean structure
+- **Redux Toolkit slices** for predictable state management
+- **Async thunks** for handling API requests
+- **Centralized API service** for network communication
+- **Expo Router** for scalable navigation
 
-```
-DATABASE_URL=postgresql://...  # Neon PostgreSQL connection
-JWT_SECRET=your-secret-key     # JWT signing key (change in production!)
-PORT=4000
-NODE_ENV=development
-```
+---
 
-## Database Schema
+## Optimization & Performance
 
-### User
+- Efficient rendering with memoization where needed
+- Responsive layouts across different screen sizes
+- Proper loading states and error handling
+- User feedback via persistent toast notifications during async operations
 
-- `id` (cuid) — Primary key
-- `email` — Unique email address
-- `username` — Unique username
-- `password` — Hashed password
-- `createdAt`, `updatedAt` — Timestamps
+---
 
-### Note
+## Security
 
-- `id` (cuid) — Primary key
-- `title` — Note title
-- `content` — Note content
-- `category` — Category (work/study/personal)
-- `userId` — Foreign key to User
-- `createdAt`, `updatedAt` — Timestamps
+- Token-based authentication (JWT)
+- Secure storage of auth tokens
+- Protected routes for authenticated users only
 
-## Next Steps
+---
 
-1. **Complete Prisma Integration** — Finalize schema validation and generate client properly
-2. **Implement Full CRUD** — Wire services/controllers to Prisma client
-3. **Test API Endpoints** — Use Postman or curl to validate endpoints
-4. **Connect Frontend to Backend** — Update Redux and API service layer with real endpoints
-5. **Add Unit Tests** — Jest/Vitest for backend and frontend
-6. **Deploy** — Vercel (frontend), Railway/Heroku (backend)
+## Future Improvements
 
-## Development
+- Offline support with local caching
+- Cloud sync
+- Note sharing
+- Rich text formatting
+- Dark mode
 
-### Frontend (in `frontend/` folder)
+---
 
-```bash
-npm run dev      # Start Expo dev server
-npm run build    # Build for production
-```
+## Author
 
-### Backend (in `backend/` folder)
+**Siyabonga Khanyile**  
+Software Developer (Mobile & Web)
 
-```bash
-npm run dev      # Start with nodemon (hot reload)
-npm run build    # Compile TypeScript to JavaScript
-npm start        # Run compiled server
-npm run prisma:generate  # Regenerate Prisma client
-npm run prisma:migrate   # Run migrations
-```
-
-## Architecture
-
-### Backend Structure (Service/Controller/Routes)
-
-**Routes** → **Controllers** → **Services** → **Database**
-
-- **Routes** (`routes/*.ts`): Define HTTP endpoints
-- **Controllers** (`controllers/*.ts`): Parse requests, call services, return responses
-- **Services** (`services/*.ts`): Implement business logic, database queries
-- **Middleware** (`middleware/*.ts`): JWT authentication, error handling
-
-### Frontend Architecture
-
-- **Redux Store** (`store/slices/*.ts`): Centralized auth & notes state
-- **Screens** (`app/*.tsx`): Page components with file-based routing
-- **Components** (`components/*.tsx`): Reusable UI elements
-- **Hooks** (`hooks/*.ts`): Custom React Native hooks (color scheme, theme)
+---
 
 ## License
 
-MIT
+This project is for learning and portfolio purposes.  
+All rights reserved by the author.
+
+---
+
