@@ -84,8 +84,8 @@ A detailed explanation of the full development process (planning → design → 
 ### Download & Install
 - Download the APK file from the link below:
   
-📦 **APK Download:**  
-👉 `PASTE APK DOWNLOAD LINK HERE`
+**APK Download:**  
+[`Download apk here`](https://expo.dev/accounts/siyabonga_khanyile/projects/Notetaker/builds/1cbe57a2-ae12-40ce-9898-35d2eb9a7f43)
 
 - Enable **“Install from unknown sources”** on your Android device if prompted
 - Install and open the app
