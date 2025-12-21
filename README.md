@@ -64,7 +64,7 @@ The project follows a structured, component-driven development approach with a s
 - **Figma Make (AI-assisted design)**
 
 ### Tooling
-- **ChatGPT / Claude / GitHub Copilot**
+- **ChatGPT / GitHub Copilot**
 - **VS Code**
 - **Git & GitHub**
 
