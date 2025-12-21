@@ -10,6 +10,7 @@ import {
   useRouter,
   useSegments,
 } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import "react-native-reanimated";
@@ -20,6 +21,9 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import store from "../store";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { getProfile, logout } from "../store/slices/authSlice";
+
+// Keep splash screen visible while loading
+SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -73,9 +77,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (user && isPublic) {
       router.replace("/home");
     }
-  }, [segments, user, hydrating, navigationState?.key, router]);
 
-  if (hydrating) return null;
+    // Hide splash screen after routing decision is made
+    SplashScreen.hideAsync();
+  }, [segments, user, hydrating, navigationState?.key, router]);
 
   return <>{children}</>;
 }
