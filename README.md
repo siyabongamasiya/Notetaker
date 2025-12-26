@@ -1,3 +1,4 @@
+*Note* The App might take some time loading at first as it uses the free-tier of render packages. 
 # Note Taker
 
 A modern, mobile-first notes application built to help users create, organize, edit, and manage notes efficiently.  
