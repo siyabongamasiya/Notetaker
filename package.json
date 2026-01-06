@@ -1,15 +1,24 @@
 {
-  "name": "notetaker",
+  "name": "notetaker-monorepo",
   "version": "1.0.0",
   "private": true,
   "description": "NoteTaker App - Frontend (React Native) + Backend (Express/TypeScript)",
-  "scripts": {
-    "frontend": "cd frontend && npm run dev",
-    "backend": "cd backend && npm run dev",
-    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
-  },
   "workspaces": [
     "frontend",
     "backend"
-  ]
+  ],
+  "scripts": {
+    "install-all": "npm install",
+    "bootstrap": "npm install",
+    "start-backend": "npm --prefix backend run dev",
+    "start-frontend": "npm --prefix frontend run start",
+    "start": "npm run start-backend",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run start\"",
+    "build-backend": "npm --prefix backend run build",
+    "build-frontend": "npm --prefix frontend run build || echo \"frontend build not configured\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "typescript": "^5.9.3"
+  }
 }
